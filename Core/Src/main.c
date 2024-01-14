@@ -64,6 +64,7 @@ int main(void)
   char cmd[5]="\0";    // and commands
   unsigned int addr;
   unsigned int val;
+  int16_t temp;
   int i=0;
 
   setvbuf(stdin, NULL, _IONBF, 0);
@@ -79,13 +80,13 @@ int main(void)
   MX_SPI2_Init();
   MX_USART2_UART_Init();
 
-  write_register (0x4002040c,0x5100);
+  write_register (0x4002040c,0x5100); // required for setting I2C #1 pins with internal pull ups
 
-  /* Print greeting notification  */
 
   help_menu();
 
  // main CLI loop
+
   while (1)
   {
 
@@ -120,6 +121,13 @@ int main(void)
 	  		printf("\r\n<<<<<<<Goodbye from ST32F4466RTE MCU UART terminal>>>>>\r\n");
 	  		printf("\r\n");
 	  		break;
+	  	 }
+
+	  	 else if (strstr(cmd,"temp")) {     // reading temperature sensor
+
+	  		temp = I2C_read_temp_sensor();
+	  		printf("\r\nTemperature is: %d\r\n",temp);
+
 	  	 }
 
 	  	 else if (strstr(cmd,"help")) {     // help menu of commands
@@ -323,10 +331,11 @@ void help_menu(void)
 	  printf("\r\n");
 	  printf("\r<<<<<<CLI supported commands >>>>>\r\n");
 	  printf("\r===============================================================================================\r\n");
-	  printf("\help                  : list of supported commands\r\n");
+	  printf("\rhelp                  : list of supported commands\r\n");
 	  printf("rd <xxxx>             : read a register address <xxxx>\r\n");
 	  printf("dump <xxxx> <yyyy>    : register dump from address <xxxx> # of addresses <yyyy> (32 bit each)\r\n");
 	  printf("wr <xxxx> <yyyy>      : write to a register <xxxx> value <yyyy>\r\n");
+	  printf("temp                  : read temperature sensor value\r\n");
 	  printf("quit                  : Exit Command Line terminal \r\n");
 	  printf("\r===============================================================================================\r\n");
 }
