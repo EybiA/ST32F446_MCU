@@ -15,9 +15,7 @@ DMA_HandleTypeDef hdma_i2c1_rx;
 uint8_t buf[12];
 int16_t val;
 static const uint8_t SENS_ADDR = 0x48 << 1; // Use 8-bit address
-static const uint8_t CFG_REG = 0x1;
-static const uint8_t LOW_TH_REG = 0x2;
-static const uint8_t HIGH_TH_REG = 0x3;
+
 
 /* ----------------------------------FUNCTIONS--------------------------------*/
 

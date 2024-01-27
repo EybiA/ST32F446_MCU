@@ -2,6 +2,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "I2C_driver.h"
+#include "SPI_driver.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -10,7 +11,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_I2S1_Init(void);
-static void MX_SPI2_Init(void);
 static void MX_USART2_UART_Init(void);
 static void read_register (unsigned int addr);
 static void write_register(unsigned int addr,unsigned int val);
@@ -19,8 +19,6 @@ void help_menu(void);
 /* Private variables ---------------------------------------------------------*/
 
 I2S_HandleTypeDef hi2s1;
-SPI_HandleTypeDef hspi2;
-DMA_HandleTypeDef hdma_spi2_rx;
 UART_HandleTypeDef huart2;
 
 /* UART input/output configuration---------------------------------------------*/
@@ -209,29 +207,6 @@ static void MX_I2S1_Init(void)
   hi2s1.Init.ClockSource = I2S_CLOCK_PLL;
   hi2s1.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_DISABLE;
   if (HAL_I2S_Init(&hi2s1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-}
-
-
-static void MX_SPI2_Init(void)
-{
-
-  hspi2.Instance = SPI2;
-  hspi2.Init.Mode = SPI_MODE_MASTER;
-  hspi2.Init.Direction = SPI_DIRECTION_1LINE;
-  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi2.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi2) != HAL_OK)
   {
     Error_Handler();
   }
