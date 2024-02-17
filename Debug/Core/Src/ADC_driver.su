@@ -1,0 +1,6 @@
+../Core/Src/ADC_driver.c:22:13:MX_ADC1_Init	24	static
+../Core/Src/ADC_driver.c:65:13:MX_DAC_Init	16	static
+../Core/Src/ADC_driver.c:88:14:read_ADC	8	static
+../Core/Src/ADC_driver.c:108:6:HAL_ADC_ConvCpltCallback	16	static
+../Core/Src/ADC_driver.c:116:13:DAC_output	8	static
+../Core/Src/ADC_driver.c:137:13:DAC_output_Stop	8	static

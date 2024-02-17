@@ -1,17 +1,20 @@
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
 #include "main.h"
 #include "I2C_driver.h"
 #include "SPI_driver.h"
-#include <stdio.h>
-#include <string.h>
+#include "ADC_driver.h"
+#include "DMA_driver.h"
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
+
 static void MX_I2S1_Init(void);
 static void MX_USART2_UART_Init(void);
+void        SystemClock_Config(void);
+static void MX_GPIO_Init(void);
 static void read_register (unsigned int addr);
 static void write_register(unsigned int addr,unsigned int val);
 void help_menu(void);
@@ -63,6 +66,8 @@ int main(void)
   unsigned int addr;
   unsigned int val;
   int16_t temp;
+  float V;
+  uint8_t res;
   int i=0;
 
   setvbuf(stdin, NULL, _IONBF, 0);
@@ -72,14 +77,14 @@ int main(void)
   HAL_Init();
   SystemClock_Config();
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_I2C1_Init();
   MX_I2S1_Init();
   MX_SPI2_Init();
+  MX_ADC1_Init();
+  MX_DAC_Init();
   MX_USART2_UART_Init();
 
   write_register (0x4002040c,0x5100); // required for setting I2C #1 pins with internal pull ups
-
 
   help_menu();
 
@@ -128,20 +133,42 @@ int main(void)
 
 	  	 }
 
+	  	 else if (strstr(cmd,"spi")) {     // reading temperature sensor
+
+	  		res=SPI_read();
+	  		printf("\r\nST32F446 MCU SPI slave interface approached by host and answered with 0xABCDCAFE\r\n");
+
+	  	 }
+
+	  	 else if (strstr(cmd,"adc")) {     // reading temperature sensor
+
+	  		V=read_ADC();
+	  		printf("\r\nVoltage measured at PA5 physical pin is: %.2f[V]\r\n",(float)V);
+
+	  	 }
+
+	  	 else if (strstr(cmd,"dac")) {     // reading temperature sensor
+
+	  		printf("\r\nOutput the signal measured on PA5 GPIO pin....\r\n");
+	  		DAC_output();
+
+	  	 }
+
 	  	 else if (strstr(cmd,"help")) {     // help menu of commands
 
 	  		help_menu();
+	  		DAC_output_Stop();
 
 	  	 }
 
 	  	 else {
 
 	  		 printf("\runknown command, please type again...\r\n");
+	  		 DAC_output_Stop();
 
 
-	  	 	  }
+	  	 	  }	  	 setvbuf(stdin, NULL, _IONBF, 0);
 
-	  	 setvbuf(stdin, NULL, _IONBF, 0);
 
 
   	  }  // end of while loop
@@ -213,6 +240,12 @@ static void MX_I2S1_Init(void)
 
 }
 
+// ****************************************************************************
+
+/**USART2 GPIO Configuration
+PA2     ------> USART2_TX
+PA3     ------> USART2_RX
+*/
 
 static void MX_USART2_UART_Init(void)
 {
@@ -232,29 +265,21 @@ static void MX_USART2_UART_Init(void)
 
 }
 
-static void MX_DMA_Init(void)
-{
+// ****************************************************************************
 
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-  /* DMA1_Stream3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
-
-}
 
 static void MX_GPIO_Init(void)
 {
 
-  __HAL_RCC_GPIOC_CLK_ENABLE();
+//  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
 }
 
+// ****************************************************************************
 
 void Error_Handler(void)
 {
@@ -264,6 +289,8 @@ void Error_Handler(void)
 
 }
 
+// ****************************************************************************
+
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
@@ -272,6 +299,9 @@ void Error_Handler(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
+
+// ****************************************************************************
+
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
@@ -280,6 +310,8 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
+// ****************************************************************************
 
 void read_register(unsigned int addr)
 {
@@ -291,6 +323,8 @@ void read_register(unsigned int addr)
 
 }
 
+// ****************************************************************************
+
 void write_register(unsigned int addr, unsigned int val)
 {
 
@@ -299,20 +333,26 @@ void write_register(unsigned int addr, unsigned int val)
 
 }
 
+// ****************************************************************************
+
 void help_menu(void)
 
 {
 	  printf("\r<<<<<<<Hello from ST32F4466RTE MCU UART terminal>>>>>\r\n");
 	  printf("\r\n");
-	  printf("\r<<<<<<CLI supported commands >>>>>\r\n");
-	  printf("\r===============================================================================================\r\n");
+	  printf("\r<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CLI supported commands >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
+	  printf("\r=========================================================================================================\r\n");
 	  printf("\rhelp                  : list of supported commands\r\n");
 	  printf("rd <xxxx>             : read a register address <xxxx>\r\n");
 	  printf("dump <xxxx> <yyyy>    : register dump from address <xxxx> # of addresses <yyyy> (32 bit each)\r\n");
 	  printf("wr <xxxx> <yyyy>      : write to a register <xxxx> value <yyyy>\r\n");
 	  printf("temp                  : read temperature sensor value\r\n");
+	  printf("spi                   : allow host to send an SPI command to MCU SPI slave interface\r\n");
+	  printf("adc                   : print analog reading from MCU ADC interface (pin A5 input)\r\n");
+	  printf("dac                   : output on MCU PA5 DAC output pin the signal measured with ADC on PA4 GPIO pin\r\n");
 	  printf("quit                  : Exit Command Line terminal \r\n");
-	  printf("\r===============================================================================================\r\n");
-}
+	  printf("\r=========================================================================================================\r\n");
 
+}
+// ****************************************************************************
 
