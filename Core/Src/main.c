@@ -83,6 +83,7 @@ int main(void)
   MX_ADC1_Init();
   MX_DAC_Init();
   MX_USART2_UART_Init();
+  MX_TIM3_Init();
 
   write_register (0x4002040c,0x5100); // required for setting I2C #1 pins with internal pull ups
 
@@ -221,6 +222,8 @@ void SystemClock_Config(void)
   }
 }
 
+// ****************************************************************************
+
 static void MX_I2S1_Init(void)
 {
 
@@ -241,6 +244,8 @@ static void MX_I2S1_Init(void)
 }
 
 // ****************************************************************************
+
+
 
 /**USART2 GPIO Configuration
 PA2     ------> USART2_TX
@@ -267,7 +272,6 @@ static void MX_USART2_UART_Init(void)
 
 // ****************************************************************************
 
-
 static void MX_GPIO_Init(void)
 {
 
@@ -278,38 +282,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
 }
-
-// ****************************************************************************
-
-void Error_Handler(void)
-{
-
-  __disable_irq();
-  	 printf ("An error occured! Will break now...");
-
-}
-
-// ****************************************************************************
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-
-// ****************************************************************************
-
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
 
 // ****************************************************************************
 
@@ -356,3 +328,33 @@ void help_menu(void)
 }
 // ****************************************************************************
 
+
+void Error_Handler(void)
+{
+
+  __disable_irq();
+  	 printf ("An error occured! Will break now...");
+
+}
+
+// ****************************************************************************
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+
+// ****************************************************************************
+
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */

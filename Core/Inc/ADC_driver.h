@@ -9,11 +9,13 @@
 #define TEMP_SENSOR_VOLTAGE_MV_AT_25                                760.0f
 #define ADC_REFERENCE_VOLTAGE_MV                                    3300.0f
 #define ADC_MAX_OUTPUT_VALUE                                        4095.0f
+extern TIM_HandleTypeDef htim3;
 
 extern void MX_ADC1_Init(void);
 extern float read_ADC(void);
 extern void MX_DAC_Init(void);
 extern void DAC_output(void);
 extern void DAC_output_Stop(void);
+extern void MX_TIM3_Init(void);
 
 #endif /* INC_ADC_DRIVER_H_ */

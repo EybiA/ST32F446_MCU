@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
+#include "ADC_Driver.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -55,12 +56,10 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_adc1;
 extern DMA_HandleTypeDef hdma_i2c1_rx;
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
-extern DMA_HandleTypeDef hdma_adc1;
-//extern ADC_HandleTypeDef hadc1;
-//extern DAC_HandleTypeDef hdac1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -96,6 +95,12 @@ void HardFault_Handler(void)
     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
     /* USER CODE END W1_HardFault_IRQn 0 */
   }
+}
+
+
+void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
+{
+	printf("\n\rTimer interrupt!\r");
 }
 
 /**
@@ -208,16 +213,15 @@ void SysTick_Handler(void)
   */
 void DMA1_Stream0_IRQHandler(void)
 {
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
 
+  /* USER CODE END DMA1_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
 
+  /* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 
-void DMA2_Stream0_IRQHandler(void)
-{
-
-  HAL_DMA_IRQHandler(&hdma_adc1);
-}
 /**
   * @brief This function handles I2C1 event interrupt.
   */
@@ -263,7 +267,16 @@ void USART2_IRQHandler(void)
 /**
   * @brief This function handles DMA2 stream0 global interrupt.
   */
+void DMA2_Stream0_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
 
+  /* USER CODE END DMA2_Stream0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc1);
+  /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream0_IRQn 1 */
+}
 
 /* USER CODE BEGIN 1 */
 

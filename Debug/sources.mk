@@ -25,5 +25,5 @@ OBJCOPY_BIN :=
 SUBDIRS := \
 Core/Src \
 Core/Startup \
-Drivers/STM32F4xx_HAL_Driver/Src \
+Drivers/STM32F4xx_HAL_Driver \
 
