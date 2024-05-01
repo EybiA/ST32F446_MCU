@@ -15,6 +15,7 @@ static void MX_I2S1_Init(void);
 static void MX_USART2_UART_Init(void);
 void        SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void GPIO_blink(void);
 static void read_register (unsigned int addr);
 static void write_register(unsigned int addr,unsigned int val);
 void help_menu(void);
@@ -87,14 +88,16 @@ int main(void)
 
   write_register (0x4002040c,0x5100); // required for setting I2C #1 pins with internal pull ups
 
-  help_menu();
+  printf("\r\n<<<<<<<Hello from ST32F4466RTE MCU UART terminal>>>>>\r\n");
+  printf("\r\nFor menu please type help\r\n");
+  printf("\r\n");
 
  // main CLI loop
 
   while (1)
   {
 
-	  	 printf("\rST32F446>>");
+	  	 printf("\rST32F446RTE>>");
 
 	  	 scanf("%[^\r]", input);
 
@@ -103,6 +106,7 @@ int main(void)
 
 	  	 if (strstr(cmd,"rd")) {         // reading from a register
 	  		read_register(addr);
+	  		printf("\r\n");
 
 	  	 }
 
@@ -112,6 +116,7 @@ int main(void)
 	  			read_register(addr);
 	  			addr=addr+4;
 	  		 }
+	  		printf("\r\n");
 
 	  	 }
 
@@ -122,6 +127,7 @@ int main(void)
 	  	 }
 
 	  	 else if (strstr(cmd,"quit")) {    // writing to a register
+
 	  		printf("\r\n<<<<<<<Goodbye from ST32F4466RTE MCU UART terminal>>>>>\r\n");
 	  		printf("\r\n");
 	  		break;
@@ -134,26 +140,34 @@ int main(void)
 
 	  	 }
 
-	  	 else if (strstr(cmd,"spi")) {     // reading temperature sensor
+	  	 else if (strstr(cmd,"spi")) {     // activating SPI interface
 
 	  		res=SPI_read();
 	  		printf("\r\nST32F446 MCU SPI slave interface approached by host and answered with 0xABCDCAFE\r\n");
 
 	  	 }
 
-	  	 else if (strstr(cmd,"adc")) {     // reading temperature sensor
+	  	 else if (strstr(cmd,"adc")) {     // sampling voltage level
 
 	  		V=read_ADC();
 	  		printf("\r\nVoltage measured at PA5 physical pin is: %.2f[V]\r\n",(float)V);
 
 	  	 }
 
-	  	 else if (strstr(cmd,"dac")) {     // reading temperature sensor
+	  	 else if (strstr(cmd,"dac")) {     // output DAC signal
 
 	  		printf("\r\nOutput the signal measured on PA5 GPIO pin....\r\n");
 	  		DAC_output();
 
 	  	 }
+
+	  	 else if (strstr(cmd,"gpio")) {     // toggling LED GPIO
+
+	  		printf("\r\nBlink LED associated with PA5 GPIO pin....\r\n");
+	  		GPIO_blink();
+
+	  	 }
+
 
 	  	 else if (strstr(cmd,"help")) {     // help menu of commands
 
@@ -169,8 +183,6 @@ int main(void)
 
 
 	  	 	  }	  	 setvbuf(stdin, NULL, _IONBF, 0);
-
-
 
   	  }  // end of while loop
 
@@ -245,8 +257,6 @@ static void MX_I2S1_Init(void)
 
 // ****************************************************************************
 
-
-
 /**USART2 GPIO Configuration
 PA2     ------> USART2_TX
 PA3     ------> USART2_RX
@@ -270,18 +280,6 @@ static void MX_USART2_UART_Init(void)
 
 }
 
-// ****************************************************************************
-
-static void MX_GPIO_Init(void)
-{
-
-//  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-
-}
 
 // ****************************************************************************
 
@@ -291,7 +289,7 @@ void read_register(unsigned int addr)
 	 // reading a register command
 
 	 data = READ_REG(*((unsigned int *)addr));
-	 printf("\r\nRegister 0x%x, value : 0x%x \r\n",addr,data);
+	 printf("\r\nRegister 0x%x, value : 0x%x \r",addr,data);
 
 }
 
@@ -310,9 +308,8 @@ void write_register(unsigned int addr, unsigned int val)
 void help_menu(void)
 
 {
-	  printf("\r<<<<<<<Hello from ST32F4466RTE MCU UART terminal>>>>>\r\n");
-	  printf("\r\n");
-	  printf("\r<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CLI supported commands >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
+
+	  printf("\r\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CLI supported commands >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
 	  printf("\r=========================================================================================================\r\n");
 	  printf("\rhelp                  : list of supported commands\r\n");
 	  printf("rd <xxxx>             : read a register address <xxxx>\r\n");
@@ -322,10 +319,39 @@ void help_menu(void)
 	  printf("spi                   : allow host to send an SPI command to MCU SPI slave interface\r\n");
 	  printf("adc                   : print analog reading from MCU ADC interface (pin A5 input)\r\n");
 	  printf("dac                   : output on MCU PA5 DAC output pin the signal measured with ADC on PA4 GPIO pin\r\n");
+	  printf("gpio                  : toggle GPIO PA#5 (i.e., blinking LED on the board\r\n");
 	  printf("quit                  : Exit Command Line terminal \r\n");
 	  printf("\r=========================================================================================================\r\n");
 
 }
+// ****************************************************************************
+
+static void MX_GPIO_Init(void)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+
+}
+
+// ****************************************************************************
+
+
+void GPIO_blink()
+{
+
+	 write_register (0x40020000,0xA80087A0);  // configuring PA5 pin to GPIO
+	 write_register (0x40020014,0x20);        // setting the bit to HIGH
+	 HAL_Delay(1000);
+	 write_register (0x40020014,0x0);         // setting the bit to LOW
+
+	 write_register (0x40020000,0xA8008FA0);  // configuring PA5 GPIO back to
+                                              // analog mode
+}
+
 // ****************************************************************************
 
 

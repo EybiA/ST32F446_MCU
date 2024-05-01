@@ -15,7 +15,7 @@ TIM_HandleTypeDef htim3;
 
 uint16_t adc_dma_buf[10];
 int32_t sensorValue=0;
-volatile int adc_conv_complete_flag;
+int adc_conv_complete_flag;
 float voltage;
 
 /* ----------------------------------FUNCTIONS--------------------------------*/
@@ -98,7 +98,6 @@ extern float read_ADC(void)
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_dma_buf , 10); // start ADC => DMA samples transfer
 
-
 	while (adc_conv_complete_flag==0)   // waiting until DMA if filled with ADC data
 	{
 
@@ -118,11 +117,9 @@ extern float read_ADC(void)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
 {
+	HAL_TIM_Base_Stop(&htim3);
 	adc_conv_complete_flag = 1;
 	printf("\n\rSamples are moved by DMA to memory!\r");
-	HAL_ADC_Stop(&hadc1);
-	HAL_TIM_Base_Stop(&htim3);
-
 
 }
 
