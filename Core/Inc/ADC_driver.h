@@ -15,6 +15,7 @@ extern void MX_ADC1_Init(void);
 extern float read_ADC(void);
 extern void MX_DAC_Init(void);
 extern void DAC_output(void);
+extern void DAC_generate(unsigned int voltage);
 extern void DAC_output_Stop(void);
 extern void MX_TIM3_Init(void);
 

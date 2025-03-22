@@ -156,8 +156,9 @@ int main(void)
 
 	  	 else if (strstr(cmd,"dac")) {     // output DAC signal
 
+	  		DAC_generate(addr);
 	  		printf("\r\nOutput the signal measured on PA5 GPIO pin....\r\n");
-	  		DAC_output();
+//          DAC_output();
 
 	  	 }
 
@@ -173,6 +174,12 @@ int main(void)
 
 	  		help_menu();
 	  		DAC_output_Stop();
+
+	  	 }
+
+	  	 else if (strstr(cmd,"regs")) {     // help menu of commands
+
+	  		regs_menu();
 
 	  	 }
 
@@ -318,12 +325,48 @@ void help_menu(void)
 	  printf("temp                  : read temperature sensor value\r\n");
 	  printf("spi                   : allow host to send an SPI command to MCU SPI slave interface\r\n");
 	  printf("adc                   : print analog reading from MCU ADC interface (pin A5 input)\r\n");
-	  printf("dac                   : output on MCU PA5 DAC output pin the signal measured with ADC on PA4 GPIO pin\r\n");
+	  printf("dac <lvl in mV in hex>: output on MCU PA4 pin the DAC output analog voltage corresponding to the voltage level in mV in hex format\r\n");
 	  printf("gpio                  : toggle GPIO PA#5 (i.e., blinking LED on the board\r\n");
+	  printf("regs                  : ST32F446 registers memory mapping addresses\r\n");
 	  printf("quit                  : Exit Command Line terminal \r\n");
 	  printf("\r=========================================================================================================\r\n");
 
+
 }
+// ****************************************************************************
+
+void regs_menu(void)
+
+{
+
+	  printf("\r\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ST32F446 Registers map >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
+	  printf("\r=========================================================================================================\r\n");
+	  printf("\rFLASH_BASE          : 0x08000000\r\n");
+	  printf("CCMDATARAM_BASE       : 0x10000000\r\n");
+	  printf("SRAM1_BASE            : 0x20000000\r\n");
+	  printf("SRAM2_BASE            : 0x2001C000\r\n");
+	  printf("SRAM3_BASE            : 0x20020000\r\n");
+	  printf("PERIPH_BASE           : 0x40000000\r\n");
+	  printf("Timers                : 0x40000000-0x400023FF\r\n");
+	  printf("RTC                   : 0x40002800-0x40002BFF\r\n");
+	  printf("SPI#2/I2S#2           : 0x40003800-0x40003BFF\r\n");
+	  printf("SPI#3/I2S#3           : 0x40003C00-0x40003FFF\r\n");
+	  printf("USART#2-UART5         : 0x40004400-0x400053FF\r\n");
+	  printf("I2C#1-#3              : 0x40005400-0x40005FFF\r\n");
+	  printf("DAC                   : 0x40007400-0x400077FF\r\n");
+	  printf("ADC#1-#3              : 0x40012000-0x400123FF\r\n");
+	  printf("SPI#1,#4              : 0x40013000-0x400137FF\r\n");
+	  printf("SYSCFG                : 0x40013800-0x40013BFF\r\n");
+	  printf("SAI #1,#2             : 0x40015800-0x40015FFF\r\n");
+	  printf("GPIOs                 : 0x40020000-0x40021FFF\r\n");
+	  printf("RCC                   : 0x40023800-0x40023BFF\r\n");
+	  printf("DMA#1, #2             : 0x40026000-0x400267FF\r\n");
+	  printf("DCMI                  : 0x50050000-0x500503FF\r\n");
+	  printf("\r=========================================================================================================\r\n");
+
+
+}
+
 // ****************************************************************************
 
 static void MX_GPIO_Init(void)
